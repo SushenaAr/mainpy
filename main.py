@@ -68,7 +68,7 @@ def get_info_stack():
 
 
 if __name__ == '__main__':
-    ya= YaUploader('y0_AgAAAAAf2yxeAADLWwAAAADM9GjtVAOq_w5dQquZBqgOH-9l1xuv9nM') #указать токен
+    ya= YaUploader('') #указать токен
     patch_= ""
     file_name= '1.txt'
  #   ya.upload_file_to_disk(f'new_file/{file_name}', f'{file_name}')
