@@ -1,0 +1,4 @@
+progress==1.6
+progress-bar==8
+requests==2.28.1
+
