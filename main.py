@@ -2,7 +2,6 @@ import requests
 from pprint import pprint
 import json
 from progress.bar import IncrementalBar
-from time import sleep
 
 mylist = [1,2]
 
@@ -13,14 +12,13 @@ class photos_vk:
     url= 'https://api.vk.com/method/'
     def __init__(self):
         self.params= {
-            'access_token': 'd99dde60d99dde60d99dde6022da8da86fdd99dd99dde60ba9a43cff2ab7fc1ec8ac927', #токен здесь
+            'access_token': 'd99dde60d99dde60d99dde6022da8da86fdd99dd99dde60ba9a43cff2ab7fc1ec8ac927', #токен сервисный
             'v': '5.131'
         }
-
         return
 
 
-    def get_photos_at_vk(self , id: str): #получение названий и размеров для json-чика и соединение
+    def get_photos_at_vk(self , id: str): #получение названий и размеров для json
         photos_url= photos_vk.url + 'photos.get'
         params= {
             'album_id': 'profile',
@@ -54,8 +52,10 @@ class photos_vk:
         return all_on_json_list__ 
 
 
-    def size_url(self, id: str):  #Получаю список для загрузки на диск(формат лайк:юрл), я не смог перевести lists в global, написал второй раз
-                                  #получение response
+    def size_url(self, id: str):  #Получаю список для загрузки на диск(формат лайк:юрл)
+                                  #я не смог перевести lists в global, написал второй раз получение response,
+                                  #впринципе я мог в первой функции сделать return [all_on_json_list_, _ziped_size ],
+                                  #а не писать две функции, но уже лень переделывать и читаемость лучше
         photos_url= photos_vk.url + 'photos.get'
         params= {
             'album_id': 'profile',
@@ -68,26 +68,33 @@ class photos_vk:
 
         list_likes= []
         for dict_like_sizes in lists:
-            likes = f"{dict_like_sizes['likes']['count']}.jpg"
-            list_likes.append(likes)
+            likes = f"{dict_like_sizes['likes']['count']}"
+            format_= '.jpg'
+            unics= dict_like_sizes.get('date', '')
+            if likes+format_ in list_likes:
+                likes_2= likes+'_'.join(unics) +format_ 
+                list_likes.append(likes_2)
 
-        list_sizes= []
+            else:
+                list_likes.append(likes+format_)
+
+        list_sizes_url= []
         for dict_size in lists:
             size_list= dict_size['sizes']
             end_dict_size= size_list[-1]
-            list_sizes.append(end_dict_size['url'])
+            list_sizes_url.append(end_dict_size['url'])
 
-        _zipeed_size= list(zip(list_likes, list_sizes))
-        return(_zipeed_size)
+        _ziped_size= list(zip(list_likes, list_sizes_url))
+        return(_ziped_size)
 
 
 
 class Yadisk:
     url='https://cloud-api.yandex.net/v1/disk/resources'
-    def __init__(self):
+    def __init__(self, ya_token):
         self.headers= {
             "Content-type": "application/json",
-            'Authorization': 'OAuth y0_AgAAAAAf2yxeAADLWwAAAADM9GjtVAOq_w5dQquZBqgOH-9l1xuv9nM',
+            'Authorization': ya_token,
             'Accept': 'application/json'
             }
 
@@ -102,7 +109,6 @@ class Yadisk:
             r_list_for_json= list_for_json[:range_]
             json.dump(r_list_for_json, f)
         bar.next()
-        sleep(1)
         pprint('Запись в json прошла успешно')
 
         for name,size in renged_list:
@@ -110,14 +116,14 @@ class Yadisk:
              headers=self.headers,
              params={'url':{size}, 'path':f'{folder_name}/{name}' } )
         bar.next()
-        sleep(1)
         pprint('Данные успешно отправлены в облако')
-        bar.finish()
-        
+        bar.finish() 
         return
 
 
-
-photo= photos_vk()
-put_photos= Yadisk()
-put_photos.create_folder('new_reposit',vk_id= 411548195)
+if __name__ == '__main__':
+    token_ya= input('Введите токен яндекс полигона: ')
+    vk_id_input= input('Введите id пользователя вк: ')
+    photo= photos_vk()
+    put_photos= Yadisk(ya_token=token_ya)
+    put_photos.create_folder('new_reposit',vk_id=vk_id_input)
