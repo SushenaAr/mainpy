@@ -90,12 +90,12 @@ def size_url(id: str, key):
         return(_ziped_size)
 
 
-
 def create_json_file(vk_id ,range_, key):
     with open('1.json', 'w', encoding='utf-8') as f:
         list_for_json= get_photos_at_vk(vk_id, key=key)
         r_list_for_json= list_for_json[:int(range_)]
         json.dump(r_list_for_json, f)
+
 
 def create_folder(folder_name,vk_id ,range_, ya_token, key):
     url= 'https://cloud-api.yandex.net/v1/disk/resources'
@@ -114,6 +114,7 @@ def create_folder(folder_name,vk_id ,range_, ya_token, key):
          headers=headers,
          params={'url':{size}, 'path':f'{folder_name}/{name}' } )
     return
+
 
 def get_photos():
     bar = IncrementalBar('Countdown', max = 2)
